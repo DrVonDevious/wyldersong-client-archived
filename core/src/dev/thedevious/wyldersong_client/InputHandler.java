@@ -19,7 +19,7 @@ public class InputHandler {
 			JSONObject object = new JSONObject();
 			object.put("type", "PlayerUpdate");
 			object.put("id", player.id);
-			object.put("y", player.y - 8);
+			object.put("y", player.y - 1);
 			object.put("x", player.x);
 			client.send(object);
 		}
@@ -28,7 +28,7 @@ public class InputHandler {
 			JSONObject object = new JSONObject();
 			object.put("type", "PlayerUpdate");
 			object.put("id", player.id);
-			object.put("y", player.y + 8);
+			object.put("y", player.y + 1);
 			object.put("x", player.x);
 			client.send(object);
 		}
@@ -38,7 +38,7 @@ public class InputHandler {
 			object.put("type", "PlayerUpdate");
 			object.put("id", player.id);
 			object.put("y", player.y);
-			object.put("x", player.x - 8);
+			object.put("x", player.x - 1);
 			client.send(object);
 		}
 
@@ -47,7 +47,7 @@ public class InputHandler {
 			object.put("type", "PlayerUpdate");
 			object.put("id", player.id);
 			object.put("y", player.y);
-			object.put("x", player.x + 8);
+			object.put("x", player.x + 1);
 			client.send(object);
 		}
 	}

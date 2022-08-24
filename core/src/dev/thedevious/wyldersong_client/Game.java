@@ -1,6 +1,5 @@
 package dev.thedevious.wyldersong_client;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import org.json.JSONObject;
 
@@ -9,8 +8,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class Game extends com.badlogic.gdx.Game {
-	private int screenWidth;
-	private int screenHeight;
 	public OrthographicCamera camera;
 	private Client client;
 	private Terminal terminal;
@@ -18,17 +15,17 @@ public class Game extends com.badlogic.gdx.Game {
 
 	@Override
 	public void create () {
-		screenWidth = Gdx.graphics.getWidth();
-		screenHeight = Gdx.graphics.getHeight();
-
-		camera = new OrthographicCamera();
-		camera.setToOrtho(false, screenWidth, screenHeight);
-
 		TerminalConfig config = TerminalConfig.setDefault();
 		config.title = "Wyldersong v0.01a";
 
 		terminal = new Terminal(this, config);
 		setScreen(terminal);
+
+		camera = new OrthographicCamera();
+		camera.setToOrtho(false, terminal.screenWidth, terminal.screenHeight);
+		camera.update();
+
+		System.out.println(camera.position.x);
 
 		client = new Client(this, "localhost", 8080);
 		client.connect();
@@ -65,16 +62,21 @@ public class Game extends com.badlogic.gdx.Game {
 
 		if (Objects.equals(object.getString("type"), "Self")) {
 			Entity player = new Entity(UUID.fromString(object.getString("id")), object.getInt("x"), object.getInt("y"), 64);
-			terminal.entities.add(player);
+			terminal.playerEntity = player;
 			terminal.input = new InputHandler(client, player);
 		} else if (Objects.equals(object.getString("type"), "Player")) {
 			Entity entity = new Entity(UUID.fromString(object.getString("id")), object.getInt("x"), object.getInt("y"), 2);
 			terminal.entities.add(entity);
 		} else if (Objects.equals(object.getString("type"), "PlayerUpdate")) {
-			for (Entity entity : terminal.entities) {
-				if (Objects.equals(object.getString("id"), entity.id.toString())) {
-					entity.y = object.getInt("y");
-					entity.x = object.getInt("x");
+			if (Objects.equals(object.getString("id"), terminal.playerEntity.id.toString())) {
+				terminal.playerEntity.x = object.getInt("x");
+				terminal.playerEntity.y = object.getInt("y");
+			} else {
+				for (Entity entity : terminal.entities) {
+					if (Objects.equals(object.getString("id"), entity.id.toString())) {
+						entity.y = object.getInt("y");
+						entity.x = object.getInt("x");
+					}
 				}
 			}
 		}

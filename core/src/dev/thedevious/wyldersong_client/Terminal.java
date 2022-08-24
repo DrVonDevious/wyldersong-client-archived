@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import java.util.ArrayList;
@@ -18,8 +19,8 @@ import static com.badlogic.gdx.graphics.Pixmap.Blending.None;
 public class Terminal extends ScreenAdapter {
 	public TerminalConfig config;
 
-	private int screenWidth;
-	private int screenHeight;
+	public int screenWidth;
+	public int screenHeight;
 	private static final float SCALE = 1.5f;
 	private static final int CELL_SIZE = 8;
 	private Texture tilesetTexture;
@@ -28,6 +29,7 @@ public class Terminal extends ScreenAdapter {
 	public InputHandler input;
 	private Pixmap pixmap;
 	private final TextureRegion[] glyphs;
+	public Entity playerEntity;
 	public List<Entity> entities;
 	private final Game game;
 
@@ -76,8 +78,6 @@ public class Terminal extends ScreenAdapter {
 
 	@Override
 	public void render(float delta) {
-		game.camera.update();
-
 		if (input != null) {
 			input.update();
 		}
@@ -96,11 +96,23 @@ public class Terminal extends ScreenAdapter {
 			print(config.width / 2, config.height / 2, "Connecting...", true);
 		}
 
+		if (playerEntity != null) {
+			game.camera.position.set(
+				playerEntity.x * CELL_SIZE * SCALE,
+				(screenHeight) - (playerEntity.y * CELL_SIZE * SCALE),
+				0
+			);
+			game.camera.update();
+			draw(playerEntity.x, playerEntity.y, playerEntity.glyph);
+		}
+
 		if (entities != null) {
 			for (Entity entity : entities) {
-				draw(entity.x / CELL_SIZE, entity.y / CELL_SIZE, entity.glyph);
+				draw(entity.x, entity.y, entity.glyph);
 			}
 		}
+
+		batch.setProjectionMatrix(game.camera.combined);
 
 		batch.end();
 	}
