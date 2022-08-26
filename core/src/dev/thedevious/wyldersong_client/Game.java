@@ -11,21 +11,22 @@ public class Game extends com.badlogic.gdx.Game {
 	public OrthographicCamera camera;
 	private Client client;
 	private Terminal terminal;
+	private static final String VERSION = "v0.02a";
 	public boolean isConnected = false;
 
 	@Override
 	public void create () {
 		TerminalConfig config = TerminalConfig.setDefault();
-		config.title = "Wyldersong v0.01a";
+		config.title = "Wyldersong " + VERSION;
 
 		terminal = new Terminal(this, config);
 		setScreen(terminal);
 
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, terminal.screenWidth, terminal.screenHeight);
+		System.out.println(terminal.screenHeight);
+		camera.position.set((float) terminal.screenWidth / 2, (float) terminal.screenHeight / 2, 0);
 		camera.update();
-
-		System.out.println(camera.position.x);
 
 		client = new Client(this, "localhost", 8080);
 		client.connect();
@@ -71,6 +72,7 @@ public class Game extends com.badlogic.gdx.Game {
 			if (Objects.equals(object.getString("id"), terminal.playerEntity.id.toString())) {
 				terminal.playerEntity.x = object.getInt("x");
 				terminal.playerEntity.y = object.getInt("y");
+				client.isReady = true;
 			} else {
 				for (Entity entity : terminal.entities) {
 					if (Objects.equals(object.getString("id"), entity.id.toString())) {

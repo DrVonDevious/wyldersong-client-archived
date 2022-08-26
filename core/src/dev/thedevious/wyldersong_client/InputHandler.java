@@ -14,41 +14,43 @@ public class InputHandler {
 	}
 
 	public void update() {
-		// TODO: Don't repeat yourself...
-		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-			JSONObject object = new JSONObject();
-			object.put("type", "PlayerUpdate");
-			object.put("id", player.id);
-			object.put("y", player.y - 1);
-			object.put("x", player.x);
-			client.send(object);
-		}
+		if (client.isReady) {
+			// TODO: Don't repeat yourself...
+			if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+				client.isReady = false;
+				JSONObject object = new JSONObject();
+				object.put("type", "MovePlayer");
+				object.put("id", player.id);
+				object.put("value", "MoveNorth");
+				client.send(object);
+			}
 
-		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-			JSONObject object = new JSONObject();
-			object.put("type", "PlayerUpdate");
-			object.put("id", player.id);
-			object.put("y", player.y + 1);
-			object.put("x", player.x);
-			client.send(object);
-		}
+			if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+				client.isReady = false;
+				JSONObject object = new JSONObject();
+				object.put("type", "MovePlayer");
+				object.put("id", player.id);
+				object.put("value", "MoveSouth");
+				client.send(object);
+			}
 
-		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-			JSONObject object = new JSONObject();
-			object.put("type", "PlayerUpdate");
-			object.put("id", player.id);
-			object.put("y", player.y);
-			object.put("x", player.x - 1);
-			client.send(object);
-		}
+			if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+				client.isReady = false;
+				JSONObject object = new JSONObject();
+				object.put("type", "MovePlayer");
+				object.put("id", player.id);
+				object.put("value", "MoveWest");
+				client.send(object);
+			}
 
-		if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-			JSONObject object = new JSONObject();
-			object.put("type", "PlayerUpdate");
-			object.put("id", player.id);
-			object.put("y", player.y);
-			object.put("x", player.x + 1);
-			client.send(object);
+			if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+				client.isReady = false;
+				JSONObject object = new JSONObject();
+				object.put("type", "MovePlayer");
+				object.put("id", player.id);
+				object.put("value", "MoveEast");
+				client.send(object);
+			}
 		}
 	}
 }

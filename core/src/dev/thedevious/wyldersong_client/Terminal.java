@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import java.util.ArrayList;
@@ -42,6 +41,12 @@ public class Terminal extends ScreenAdapter {
 
 		Gdx.graphics.setTitle(config.title);
 		Gdx.graphics.setWindowedMode(this.screenWidth, this.screenHeight);
+
+		Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
+		Gdx.gl.glDisable(GL20.GL_CULL_FACE);
+		Gdx.gl.glEnable(GL20.GL_BLEND);
+		Gdx.gl.glEnable(GL20.GL_TEXTURE_2D);
+		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
 
 		this.batch = new SpriteBatch();
 		this.shapeRenderer = new ShapeRenderer();
@@ -84,11 +89,17 @@ public class Terminal extends ScreenAdapter {
 
 		ScreenUtils.clear(0, 0, 0, 1);
 
-		Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
-		Gdx.gl.glDisable(GL20.GL_CULL_FACE);
-		Gdx.gl.glEnable(GL20.GL_BLEND);
-		Gdx.gl.glEnable(GL20.GL_TEXTURE_2D);
-		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
+		if (playerEntity != null) {
+			game.camera.position.set(
+				playerEntity.x * CELL_SIZE * SCALE,
+				(screenHeight) - (playerEntity.y * CELL_SIZE * SCALE),
+				0
+			);
+		}
+
+		game.camera.update();
+
+		batch.setProjectionMatrix(game.camera.combined);
 
 		batch.begin();
 
@@ -97,12 +108,6 @@ public class Terminal extends ScreenAdapter {
 		}
 
 		if (playerEntity != null) {
-			game.camera.position.set(
-				playerEntity.x * CELL_SIZE * SCALE,
-				(screenHeight) - (playerEntity.y * CELL_SIZE * SCALE),
-				0
-			);
-			game.camera.update();
 			draw(playerEntity.x, playerEntity.y, playerEntity.glyph);
 		}
 
@@ -111,8 +116,6 @@ public class Terminal extends ScreenAdapter {
 				draw(entity.x, entity.y, entity.glyph);
 			}
 		}
-
-		batch.setProjectionMatrix(game.camera.combined);
 
 		batch.end();
 	}
@@ -128,7 +131,7 @@ public class Terminal extends ScreenAdapter {
 		batch.draw(
 			glyphs[glyph],
 			x * CELL_SIZE * SCALE,
-			(config.height - y - 1) * CELL_SIZE * SCALE,
+			(config.height - y) * CELL_SIZE * SCALE,
 			CELL_SIZE * SCALE,
 			CELL_SIZE * SCALE
 		);

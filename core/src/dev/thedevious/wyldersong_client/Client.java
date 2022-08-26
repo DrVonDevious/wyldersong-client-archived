@@ -13,7 +13,8 @@ public class Client implements Runnable {
 	public final String host;
 	public final int port;
 	private boolean shouldDisconnect = false;
-	private Game game;
+	private final Game game;
+	public boolean isReady = true;
 
 	private PrintWriter writer;
 
@@ -52,6 +53,8 @@ public class Client implements Runnable {
 			String line = reader.readLine();
 
 			if (line == null) return;
+
+			System.out.println(line);
 
 			game.onMessage(line);
 		} catch (IOException e) {
