@@ -54,8 +54,6 @@ public class Client implements Runnable {
 
 			if (line == null) return;
 
-			System.out.println(line);
-
 			game.onMessage(line);
 		} catch (IOException e) {
 			e.printStackTrace();

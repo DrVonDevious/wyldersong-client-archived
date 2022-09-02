@@ -1,10 +1,12 @@
 package dev.thedevious.wyldersong_client;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import org.json.JSONObject;
 
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 public class Game extends com.badlogic.gdx.Game {
@@ -24,7 +26,6 @@ public class Game extends com.badlogic.gdx.Game {
 
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, terminal.screenWidth, terminal.screenHeight);
-		System.out.println(terminal.screenHeight);
 		camera.position.set((float) terminal.screenWidth / 2, (float) terminal.screenHeight / 2, 0);
 		camera.update();
 
@@ -62,11 +63,25 @@ public class Game extends com.badlogic.gdx.Game {
 		JSONObject object = new JSONObject(message);
 
 		if (Objects.equals(object.getString("type"), "Self")) {
-			Entity player = new Entity(UUID.fromString(object.getString("id")), object.getInt("x"), object.getInt("y"), 64);
+			Entity player = new Entity(
+				UUID.fromString(object.getString("id")),
+				object.getInt("x"),
+				object.getInt("y"),
+				64,
+				Color.BLACK,
+				Color.WHITE
+			);
 			terminal.playerEntity = player;
 			terminal.input = new InputHandler(client, player);
 		} else if (Objects.equals(object.getString("type"), "Player")) {
-			Entity entity = new Entity(UUID.fromString(object.getString("id")), object.getInt("x"), object.getInt("y"), 2);
+			Entity entity = new Entity(
+				UUID.fromString(object.getString("id")),
+				object.getInt("x"),
+				object.getInt("y"),
+				64,
+				Color.BLACK,
+				Color.GREEN
+			);
 			terminal.entities.add(entity);
 		} else if (Objects.equals(object.getString("type"), "PlayerUpdate")) {
 			if (Objects.equals(object.getString("id"), terminal.playerEntity.id.toString())) {
@@ -81,6 +96,64 @@ public class Game extends com.badlogic.gdx.Game {
 					}
 				}
 			}
+		}
+
+		if (Objects.equals(object.getString("type"), "Structure")) {
+			if (Objects.equals(object.getString("sub_type"), "Tree")) {
+				Color fg;
+
+				if (Objects.equals(object.getString("species"), "Oak")) {
+					fg = Color.GREEN;
+				} else {
+					fg = Color.ORANGE;
+				}
+
+				Entity entity = new Entity(
+					UUID.randomUUID(),
+					object.getInt("x"),
+					object.getInt("y"),
+					6,
+					Color.BLACK,
+					fg
+				);
+
+				entity.name = object.getString("name");
+
+				System.out.println(object.getInt("x") + ", " + object.getInt("y"));
+
+				terminal.structures.add(entity);
+			}
+		}
+
+		if (Objects.equals(object.getString("type"), "Tile")) {
+			if (Objects.equals(object.getString("tile_type"), "grass_tile")) {
+				int grassColorChance = ThreadLocalRandom.current().nextInt(0, 99 + 1);
+				Color grassColor;
+
+				if (grassColorChance < 20) {
+					grassColor = Color.ORANGE;
+				} else {
+					grassColor = Color.OLIVE;
+				}
+
+				Entity entity = new Entity(
+					UUID.randomUUID(),
+					object.getInt("x"),
+					object.getInt("y"),
+					44,
+					Color.BLACK,
+					grassColor
+				);
+				terminal.tiles.add(entity);
+			}
+		}
+
+		if (Objects.equals(object.getString("type"), "Started_Loading")) {
+			terminal.isMapLoaded = false;
+		}
+
+		if (Objects.equals(object.getString("type"), "Finished_Loading")) {
+			terminal.isMapLoaded = true;
 		}
 	}
 }

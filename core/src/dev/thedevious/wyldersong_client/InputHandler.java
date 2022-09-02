@@ -2,11 +2,16 @@ package dev.thedevious.wyldersong_client;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.math.Vector3;
 import org.json.JSONObject;
 
 public class InputHandler {
 	public Client client;
 	public Entity player;
+	public int mouseX = 0;
+	public int mouseY = 0;
+	public long mouseCellX = 0;
+	public long mouseCellY = 0;
 
 	public InputHandler(Client client, Entity player) {
 		this.client = client;
@@ -15,6 +20,9 @@ public class InputHandler {
 
 	public void update() {
 		if (client.isReady) {
+			this.mouseX = Gdx.input.getX();
+			this.mouseY = Gdx.input.getY();
+
 			// TODO: Don't repeat yourself...
 			if (Gdx.input.isKeyPressed(Input.Keys.W)) {
 				client.isReady = false;
