@@ -1,6 +1,7 @@
 package dev.thedevious.wyldersong_client;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -36,6 +37,7 @@ public class Terminal extends ScreenAdapter {
 	public List<Entity> tiles;
 	public boolean isMapLoaded = false;
 	private final Game game;
+	private final ActionPanel actionPanel;
 
 	public Terminal(Game game, TerminalConfig config) {
 		this.game = game;
@@ -45,6 +47,7 @@ public class Terminal extends ScreenAdapter {
 		this.entities = new ArrayList<>();
 		this.structures = new ArrayList<>();
 		this.tiles = new ArrayList<>();
+		this.actionPanel = new ActionPanel(this);
 
 		Gdx.graphics.setTitle(config.title);
 		Gdx.graphics.setWindowedMode(this.screenWidth, this.screenHeight);
@@ -102,6 +105,10 @@ public class Terminal extends ScreenAdapter {
 			input.mouseCellY = -Math.round(((mousePosition.y - screenHeight) / CELL_SIZE / SCALE) - 0.5);
 		}
 
+		if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+			actionPanel.isOpen = false;
+		}
+
 		if (playerEntity != null) {
 			game.camera.position.set(
 				playerEntity.x * CELL_SIZE * SCALE,
@@ -148,6 +155,13 @@ public class Terminal extends ScreenAdapter {
 			for (Entity entity : structures) {
 				if (entity.x == input.mouseCellX && entity.y == input.mouseCellY) {
 					print(playerEntity.x - 40, playerEntity.y + 25, entity.name);
+
+					if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
+						actionPanel.originX = (int) input.mouseCellX;
+						actionPanel.originY = (int) input.mouseCellY;
+						actionPanel.isOpen = true;
+						actionPanel.actions.add(entity.name);
+					}
 				}
 			}
 
@@ -157,6 +171,8 @@ public class Terminal extends ScreenAdapter {
 				}
 			}
 		}
+
+		actionPanel.render(game.camera);
 
 		batch.end();
 	}
@@ -179,6 +195,22 @@ public class Terminal extends ScreenAdapter {
 		);
 	}
 
+	public void fill(int x, int y, int width, int height, Color color) {
+		batch.setColor(color);
+
+		for (int cell_y = 0; cell_y < height; cell_y++) {
+			for (int cell_x = 0; cell_x < width; cell_x++) {
+				batch.draw(
+					glyphs[219],
+					(x + cell_x) * CELL_SIZE * SCALE,
+					((config.height - y) + cell_y + 1) * CELL_SIZE * SCALE,
+					CELL_SIZE * SCALE,
+					CELL_SIZE * SCALE
+				);
+			}
+		}
+	}
+
 	public void draw(int x, int y, int glyph, Color bg, Color fg) {
 		fill(x, y, bg);
 		batch.setColor(fg);
@@ -192,9 +224,12 @@ public class Terminal extends ScreenAdapter {
 	}
 
 	public void print(int x, int y, String string) {
+		print(x, y, string, Color.BLACK, Color.WHITE);
+	}
+
+	public void print(int x, int y, String string, Color bg, Color fg) {
 		for (int i = 0; i < string.length(); i++) {
-			fill(x + i, y, Color.BLACK);
-			draw(x + i, y, Util.toGlyph(string.charAt(i)), Color.BLACK, Color.WHITE);
+			draw(x + i, y, Util.toGlyph(string.charAt(i)), bg, fg);
 		}
 	}
 

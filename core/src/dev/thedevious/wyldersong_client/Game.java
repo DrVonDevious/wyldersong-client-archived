@@ -99,6 +99,21 @@ public class Game extends com.badlogic.gdx.Game {
 		}
 
 		if (Objects.equals(object.getString("type"), "Structure")) {
+			if (Objects.equals(object.getString("sub_type"), "Fence")) {
+				Entity entity = new Entity(
+					UUID.randomUUID(),
+					object.getInt("x"),
+					object.getInt("y"),
+					20,
+					Color.BLACK,
+					Color.BROWN
+				);
+
+				entity.name = object.getString("name");
+
+				terminal.structures.add(entity);
+			}
+
 			if (Objects.equals(object.getString("sub_type"), "Tree")) {
 				Color fg;
 
@@ -118,8 +133,6 @@ public class Game extends com.badlogic.gdx.Game {
 				);
 
 				entity.name = object.getString("name");
-
-				System.out.println(object.getInt("x") + ", " + object.getInt("y"));
 
 				terminal.structures.add(entity);
 			}
