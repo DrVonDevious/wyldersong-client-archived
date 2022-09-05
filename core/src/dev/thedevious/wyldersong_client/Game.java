@@ -15,13 +15,15 @@ public class Game extends com.badlogic.gdx.Game {
 	private Terminal terminal;
 	private static final String VERSION = "v0.02a";
 	public boolean isConnected = false;
+	public boolean isDebug = true;
 
 	@Override
 	public void create () {
 		TerminalConfig config = TerminalConfig.setDefault();
+		UIConfig uiConfig = UIConfig.setDefault();
 		config.title = "Wyldersong " + VERSION;
 
-		terminal = new Terminal(this, config);
+		terminal = new Terminal(this, config, uiConfig);
 		setScreen(terminal);
 
 		camera = new OrthographicCamera();
@@ -71,6 +73,11 @@ public class Game extends com.badlogic.gdx.Game {
 				Color.BLACK,
 				Color.WHITE
 			);
+
+			player.inventory.add("Flint Axe");
+			player.inventory.add("Rabbit Hide Gloves");
+			player.inventory.add("Oak Mug");
+
 			terminal.playerEntity = player;
 			terminal.input = new InputHandler(client, player);
 		} else if (Objects.equals(object.getString("type"), "Player")) {
@@ -115,21 +122,13 @@ public class Game extends com.badlogic.gdx.Game {
 			}
 
 			if (Objects.equals(object.getString("sub_type"), "Tree")) {
-				Color fg;
-
-				if (Objects.equals(object.getString("species"), "Oak")) {
-					fg = Color.GREEN;
-				} else {
-					fg = Color.ORANGE;
-				}
-
 				Entity entity = new Entity(
 					UUID.randomUUID(),
 					object.getInt("x"),
 					object.getInt("y"),
-					6,
+					79,
 					Color.BLACK,
-					fg
+					Color.BROWN
 				);
 
 				entity.name = object.getString("name");
@@ -141,20 +140,28 @@ public class Game extends com.badlogic.gdx.Game {
 		if (Objects.equals(object.getString("type"), "Tile")) {
 			if (Objects.equals(object.getString("tile_type"), "grass_tile")) {
 				int grassColorChance = ThreadLocalRandom.current().nextInt(0, 99 + 1);
+				int grassGlyphChance = ThreadLocalRandom.current().nextInt(0, 99 + 1);
 				Color grassColor;
+				int grassGlyph;
 
 				if (grassColorChance < 20) {
-					grassColor = Color.ORANGE;
+					grassColor = new Color(0.7f, 0.6f, 0.1f, 1);
 				} else {
-					grassColor = Color.OLIVE;
+					grassColor = new Color(0.4f, 0.8f, 0.1f, 1);
+				}
+
+				if (grassGlyphChance < 10) {
+					grassGlyph = 96;
+				} else {
+					grassGlyph = 44;
 				}
 
 				Entity entity = new Entity(
 					UUID.randomUUID(),
 					object.getInt("x"),
 					object.getInt("y"),
-					44,
-					Color.BLACK,
+					grassGlyph,
+					new Color(0, 0, 0.1f, 1),
 					grassColor
 				);
 				terminal.tiles.add(entity);

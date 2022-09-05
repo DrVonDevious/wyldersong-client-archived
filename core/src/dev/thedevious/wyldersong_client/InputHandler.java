@@ -12,6 +12,10 @@ public class InputHandler {
 	public int mouseY = 0;
 	public long mouseCellX = 0;
 	public long mouseCellY = 0;
+	public long screenCellX = 0;
+	public long screenCellY = 0;
+	public long screenUICellX = 0;
+	public long screenUICellY = 0;
 
 	public InputHandler(Client client, Entity player) {
 		this.client = client;
